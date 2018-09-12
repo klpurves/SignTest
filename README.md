@@ -1,5 +1,7 @@
 # SignTest
-Bash package to compare direction of SNP effects across samples at different p-thresholds
+Bash package to compare direction of SNP effects across samples at different p-thresholds.
+
+Use -h for usage
 
 
 Steps:   
