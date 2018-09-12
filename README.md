@@ -9,7 +9,9 @@ iii. Merge target (replication) samples with base at different thresholds so onl
 iv. Perform SNP test
 v. Perform exact binomial test (probability of 0.5, two-sided)
 
-Output is a table containing:  total indepedndent SNPS at each threshold for each sample against base, total shared SNPS, proportion shared SNPS, Binomial exact p-value.
+Output: 
+i. Table containing total indepedndent SNPS at each threshold for each sample against base, total shared SNPS, proportion shared SNPS, Binomial exact p-value.
+ii. Stacked bar plot showing proportion of SNPs shared at each p-threshold for each target/base comaprison.
 
-Optional output: Clumped base file.
+Optional output: Clumped base file (use - s flag to retain this file)
 
