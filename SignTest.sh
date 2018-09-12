@@ -59,8 +59,6 @@ printf '\n'
 
 ## Write the usage function
 
-printf '\n\nremember to unhash the cat command in usage!!! \n\n'
-
 function _usage()
 {
   ###### U S A G E : Help and ERROR (invalid options provided) ######
@@ -84,7 +82,7 @@ function _usage()
   -s If set, P1 clumped base file will be saved in a new folder (set to the provided outfile directory ./Clumped.p1)
   -v Verbose. Include this for more detailed output.
   -c Check parameters. This will include flag checks for any changes to default settings. Do not include this flag if submitting the job using qsub or similar.
-  EOF
+EOF
 }
 
 
@@ -515,7 +513,7 @@ lentar=${#tarray[@]}
       }
     }
     
-    dat <- dat[order(dat\$Target_sample,dat\$pthreshold),]
+    dat <- dat[order(dat\$pthreshold, dat\$Target_sample),]
     
     write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
     
@@ -547,7 +545,8 @@ lentar=${#tarray[@]}
     
     Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
       
-      mv ${odir}/sign.table.csv ${out}_results.csv
+      mv ${odir}/sign.table.csv {odir}/${out}_results.csv
+      mv ${odir}/stacked.bar.pdf {odir}/${out}_stacked.bar.pdf
     
     
     if [ $v == 'yes' ]
