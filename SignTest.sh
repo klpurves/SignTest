@@ -129,7 +129,7 @@ tarray=($target)
 parray=($p)
 
 lentar=${#tarray[@]}
-  lenp=${#parray[@]}
+lenp=${#parray[@]}
     
     
     ### Get output names and paths
@@ -541,7 +541,7 @@ lentar=${#tarray[@]}
     plot
     dev.off()
     
-    EOF
+ EOF
     
     Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
       
