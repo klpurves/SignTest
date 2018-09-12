@@ -534,10 +534,14 @@ lentar=${#tarray[@]}
                  facet_grid(. ~ Target_sample)                                    +
                   scale_x_discrete(labels=xlabels)                                +
                   xlab("P threshold")                                             +
-                  ylab("proportion of total SNPs shared")                         +
+                  ylab("Proportion of total SNPs shared")                         +
                   theme(legend.position='none')                                   +
                   scale_fill_manual(values = c("azure3","darkslategray"))
     
+    
+    pdf(paste(path,'stacked.bar.pdf',sep='/'))
+    plot
+    dev.off()
     
     EOF
     
