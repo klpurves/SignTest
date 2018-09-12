@@ -493,12 +493,14 @@ lentar=${#tarray[@]}
     cat <<EOF>> ${odir}/results.tab.R
     
     library(data.table)
+    library(ggplot2)
     
     args=commandArgs(TRUE)
     file=args[1]
     path=args[2]
     
     dat<- fread(file)
+    
     
     dat\$Total_SNPs <- apply(dat[,4],1,as.numeric)
     dat\$Total_Shared <- apply(dat[,5],1,as.numeric)
@@ -516,6 +518,26 @@ lentar=${#tarray[@]}
     dat <- dat[order(dat\$Target_sample,dat\$pthreshold),]
     
     write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
+    
+    ## create a plot showing shared SNPs as a proportion of total SNPs for each target / base comparison
+    
+    xlabels <- as.character(dat/$pthreshold)
+    dat$Total_Unshared <- dat$Total_SNPs - dat$Total_Shared
+    
+    datp <- subset(dat,select=c('Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
+    datm <- melt(datp,id.vars=c('Target_sample','pthreshold','Proportion'))
+    datm$variable <- factor(datm$variable,levels=c('Total_Unshared','Total_Shared'))
+    
+    plot <- ggplot(datm)                                                          +
+        geom_bar(aes(x=as.factor(pthreshold),y=value,fill=variable),
+                 stat='identity',position='fill')                                 +
+                 facet_grid(. ~ Target_sample)                                    +
+                  scale_x_discrete(labels=xlabels)                                +
+                  xlab("P threshold")                                             +
+                  ylab("proportion of total SNPs shared")                         +
+                  theme(legend.position='none')                                   +
+                  scale_fill_manual(values = c("azure3","darkslategray"))
+    
     
     EOF
     
