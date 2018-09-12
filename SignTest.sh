@@ -533,7 +533,7 @@ lentar=${#tarray[@]}
                  stat='identity',position='fill')                                 +
                  facet_grid(. ~ Target_sample)                                    +
                   scale_x_discrete(labels=xlabels)                                +
-                  xlab("P threshold")                                             +
+                  xlab("p-threshold")                                             +
                   ylab("Proportion of total SNPs shared")                         +
                   theme(legend.position='none')                                   +
                   scale_fill_manual(values = c("azure3","darkslategray"))
