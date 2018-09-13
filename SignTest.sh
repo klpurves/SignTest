@@ -323,10 +323,11 @@ printColumns ()
 { 
 read names
 while read $names; do
-for col in $*
-do
-  eval "printf '%s ' \$$col"
-done
+   for col in $*
+      do
+        eval "printf '%s ' \$$col"
+      done
+    echo
 done
 }
 
