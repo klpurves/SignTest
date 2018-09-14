@@ -536,10 +536,10 @@ plot <- ggplot(datm)                                                          +
         panel.grid = element_blank(),
         strip.text = element_text(face='bold',
                                   size=12))                                   +
-              scale_fill_manual(values = c("azure3","darkslategray"))
+              scale_fill_manual(values = c("azure3","#636363"))
 
 
-pdf(paste(path,'stacked.bar.pdf',sep='/'))
+pdf(paste(path,'stacked.bar.pdf',sep='/'),width=15)
 plot
 dev.off()
 
