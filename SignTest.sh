@@ -519,8 +519,8 @@ write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
 
 ## create a plot showing shared SNPs as a proportion of total SNPs for each target / base comparison
 
-xlabels <- as.character(dat/$pthreshold)
-dat$Total_Unshared <- dat$Total_SNPs - dat$Total_Shared
+xlabels <- as.character(dat\$pthreshold)
+dat\$Total_Unshared <- dat\$Total_SNPs - dat\$Total_Shared
 
 datp <- subset(dat,select=c('Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
 datm <- melt(datp,id.vars=c('Target_sample','pthreshold','Proportion'))
@@ -545,14 +545,15 @@ EOF
 
 Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
 
-  mv ${odir}/sign.table.csv {odir}/${out}_results.csv
-  mv ${odir}/stacked.bar.pdf {odir}/${out}_stacked.bar.pdf
+  mv ${odir}/sign.table.csv ${odir}/$(basename $out)_results.csv
+  mv ${odir}/stacked.bar.pdf {odir}/$(basename $out)_stacked.bar.pdf
+  rm ${bname}_results.csv
 
 
 if [ $v == 'yes' ]
   then
     printf '\n\n###############################\n\n'
-    echo 'Results saved to ' ${odir}/${bname}_results.csv
+    echo 'Results saved to ' ${odir}/$(basename $out)_results.csv
     printf '\n For results of two-sided exact binomial test, see results table.'
     printf '\n\n Sign test completed.... cleaning folders...\n\n'
     rm ${odir}/*.sign
