@@ -523,7 +523,7 @@ dat\$Total_Unshared <- dat\$Total_SNPs - dat\$Total_Shared
 
 datp <- subset(dat,select=c('Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
 datm <- melt(datp,id.vars=c('Target_sample','pthreshold','Proportion'))
-datm$variable <- factor(datm$variable,levels=c('Total_Unshared','Total_Shared'))
+datm\$variable <- factor(datm\$variable,levels=c('Total_Unshared','Total_Shared'))
 
 plot <- ggplot(datm)                                                          +
     geom_bar(aes(x=as.factor(pthreshold),y=value,fill=variable),
