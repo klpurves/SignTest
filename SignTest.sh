@@ -519,21 +519,23 @@ write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
 
 ## create a plot showing shared SNPs as a proportion of total SNPs for each target / base comparison
 
-xlabels <- as.character(dat\$pthreshold)
 dat\$Total_Unshared <- dat\$Total_SNPs - dat\$Total_Shared
 
 datp <- subset(dat,select=c('Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
 datm <- melt(datp,id.vars=c('Target_sample','pthreshold','Proportion'))
 datm$variable <- factor(datm$variable,levels=c('Total_Unshared','Total_Shared'))
 
-plot <- ggplot(datm)                                                            +
+plot <- ggplot(datm)                                                          +
     geom_bar(aes(x=as.factor(pthreshold),y=value,fill=variable),
              stat='identity',position='fill')                                 +
              facet_grid(. ~ Target_sample)                                    +
-              scale_x_discrete(labels=xlabels)                                +
               xlab("p-threshold")                                             +
               ylab("Proportion of total SNPs shared")                         +
-              theme(legend.position='none')                                   +
+              theme(legend.position='none',
+        panel.border = element_blank(),
+        panel.grid = element_blank(),
+        strip.text = element_text(face='bold',
+                                  size=12))                                   +
               scale_fill_manual(values = c("azure3","darkslategray"))
 
 
