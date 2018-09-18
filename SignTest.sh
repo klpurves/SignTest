@@ -341,7 +341,7 @@ then
 fi
 
 
-< $base printColumns rsid RSID SNP snp effect Effect OR or Beta beta  > ${odir}/${bname}.short
+< $base printColumns rsid RSID SNP snp SNPID effect Effect OR or Beta beta BETA  > ${odir}/${bname}.short
 
 
 if [ $v == 'yes' ]
@@ -354,7 +354,7 @@ fi
 for x in $(seq 1 $lentar)
 do
   echo ${tarray[$x-1]}
-  < ${tarray[$x-1]} printColumns rsid RSID SNP snp effect Effect OR or Beta beta > ${odir}/$(basename  ${tarray[$x-1]}).short
+  < ${tarray[$x-1]} printColumns rsid RSID SNP SNPID snp effect Effect OR or Beta beta BETA > ${odir}/$(basename  ${tarray[$x-1]}).short
 done
 
 
