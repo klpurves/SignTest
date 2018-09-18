@@ -548,7 +548,7 @@ EOF
 Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
 
   mv ${odir}/sign.table.csv ${odir}/$(basename $out)_results.csv
-  mv ${odir}/stacked.bar.pdf {odir}/$(basename $out)_stacked.bar.pdf
+  mv ${odir}/stacked.bar.pdf ${odir}/$(basename $out)_stacked.bar.pdf
   rm ${bname}_results.csv
 
 
