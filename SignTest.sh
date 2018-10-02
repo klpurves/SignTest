@@ -558,7 +558,8 @@ datm %>%
                                   size=12))                                   +
              geom_hline(yintercept=0.5,linetype="dashed",color="red")         +
              scale_fill_manual(breaks=c('p<0.05','p<0.01','p<0.005','p<0.001'),
-                               values=c("azure3","#636363","#7CABAB","#97C6C6","#B2E2E2","#CEFFFF"))
+                               values=c("azure3","#636363","#993399","#0000FF","#30D5C8","#E4FFFF"))
+                               
 
 
 pdf(paste(path,'stacked.bar.pdf',sep='/'),width=15)
