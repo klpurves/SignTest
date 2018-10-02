@@ -536,6 +536,7 @@ plot <- ggplot(datm)                                                          +
         panel.grid = element_blank(),
         strip.text = element_text(face='bold',
                                   size=12))                                   +
+        geom_hline(yintercept=0.5)                                            +
               scale_fill_manual(values = c("azure3","#636363"))
 
 
