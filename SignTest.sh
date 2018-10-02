@@ -557,7 +557,7 @@ datm %>%
                     strip.text = element_text(face='bold',
                                   size=12))                                   +
              geom_hline(yintercept=0.5,linetype="dashed",color="red")         +
-             scale_fill_manual(breaks=c('p<0.05','p<0.01','p<0.005','p<0.001'),
+             scale_fill_manual(breaks=c('p>0.05','p<0.05','p<0.01','p<0.005','p<0.001'),
                                values=c("azure3","#636363","#993399","#0000FF","#30D5C8","#E4FFFF"))
                                
 
