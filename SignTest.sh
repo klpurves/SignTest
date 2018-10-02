@@ -42,6 +42,7 @@ p='5.10e-8 5.10e-6 5.10e-4 5.10e-2 5.10e-1'
 v='no'
 s='no'
 c='no'
+facet_names=empty
 
 ## If there are no options then exit 
 
@@ -127,6 +128,7 @@ printf '\n\n'
 
 tarray=($target)
 parray=($p)
+
 
 lentar=${#tarray[@]}
 lenp=${#parray[@]}
@@ -488,17 +490,19 @@ done
 
 ### Finish up the r results table and binomial test in R
 
+ 
+
 cat <<EOF>> ${odir}/results.tab.R
 
 library(data.table)
 library(ggplot2)
+library(dplyr)
 
 args=commandArgs(TRUE)
 file=args[1]
 path=args[2]
 
 dat<- fread(file)
-
 
 dat\$Total_SNPs <- apply(dat[,4],1,as.numeric)
 dat\$Total_Shared <- apply(dat[,5],1,as.numeric)
@@ -521,23 +525,40 @@ write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
 
 dat\$Total_Unshared <- dat\$Total_SNPs - dat\$Total_Shared
 
-datp <- subset(dat,select=c('Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
-datm <- melt(datp,id.vars=c('Target_sample','pthreshold','Proportion'))
+datp <- subset(dat,select=c('Base_sample','Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
+datm <- melt(datp,id.vars=c('Base_sample','Target_sample','pthreshold','Proportion'))
 datm\$variable <- factor(datm\$variable,levels=c('Total_Unshared','Total_Shared'))
 
-plot <- ggplot(datm)                                                          +
-    geom_bar(aes(x=as.factor(pthreshold),y=value,fill=variable),
+## Create plot - use dplyr to flag and colour  significant results
+
+plot <- 
+## create variable flagging differing significant levels based on binomial test results 
+datm %>%
+      mutate(sig_flag = ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.001, 'p<0.001',
+                             ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.005, 'p<0.005',
+                             ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.01, 'p<0.01',
+                                    ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.05, 'p<0.05',
+                                           ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test > 0.005,'p>0.05','')))))) %>%
+  
+  ## Change the factor order to create approrpiate colour gradients later
+  
+  mutate(p.value = factor(sig_flag,levels = c("","p>0.05","p<0.05",'p<0.01',"p<0.005","p<0.001"))) %>%
+  
+  ## Create the ggplot
+  
+    ggplot(aes(x=as.factor(pthreshold),y=value))                              +
+    geom_bar(aes(fill=p.value),
              stat='identity',position='fill')                                 +
-             facet_grid(. ~ Target_sample)                                    +
+             facet_grid(Base_sample ~ Target_sample)                          +
               xlab("p-threshold")                                             +
               ylab("Proportion of total SNPs shared")                         +
-              theme(legend.position='none',
-        panel.border = element_blank(),
-        panel.grid = element_blank(),
-        strip.text = element_text(face='bold',
+              theme(panel.border = element_blank(),
+                    panel.grid = element_blank(),
+                    strip.text = element_text(face='bold',
                                   size=12))                                   +
-        geom_hline(yintercept=0.5)                                            +
-              scale_fill_manual(values = c("azure3","#636363"))
+             geom_hline(yintercept=0.5,linetype="dashed",color="red")         +
+             scale_fill_manual(breaks=c('p<0.05','p<0.01','p<0.005','p<0.001'),
+                               values=c("azure3","#636363","#7CABAB","#97C6C6","#B2E2E2","#CEFFFF"))
 
 
 pdf(paste(path,'stacked.bar.pdf',sep='/'),width=15)
@@ -546,7 +567,9 @@ dev.off()
 
 EOF
 
-Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
+## If label of facet names has been provided include these. If not, use default names. 
+
+  Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
 
   mv ${odir}/sign.table.csv ${odir}/$(basename $out)_results.csv
   mv ${odir}/stacked.bar.pdf ${odir}/$(basename $out)_stacked.bar.pdf
