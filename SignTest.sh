@@ -24,7 +24,9 @@ export OMP_NUM_THREADS=8
 ###        2) The proportion of SNPS shared at each threshold between the base and each target file provided
 ###        3) Whether this is significantly different from what would be predicted under the null
 
+## call in source scripts 
 
+source ./getcol
 
 ### declarations - basic argument parsing
 
@@ -319,32 +321,15 @@ fi
 
 ## retain only SNP and effect columns for all files.
 
-## function to select columns by name
+## Select columns using getcol.sh function
 
-printColumns () 
-{ 
-read names
-while read $names; do
-   for col in $*
-      do
-        eval "printf '%s ' \$$col"
-      done
-    echo
-done
-}
-
-## Select columns - allow for multiple spellings/variations assuming only one of each will exist in any given sumstats
-
-## base
 
 if [ $v == 'yes' ]
 then
   printf "\nGathering SNP and effect columns from your base file.\n\n" 
 fi
 
-
-< $base printColumns rsid RSID SNP snp SNPID effect Effect OR or Beta beta BETA  > ${odir}/${bname}.short
-
+getColumns $base 
 
 if [ $v == 'yes' ]
 then
@@ -353,12 +338,7 @@ fi
 
 ## targets
 
-for x in $(seq 1 $lentar)
-do
-  echo ${tarray[$x-1]}
-  < ${tarray[$x-1]} printColumns rsid RSID SNP SNPID snp effect Effect OR or Beta beta BETA > ${odir}/$(basename  ${tarray[$x-1]}).short
-done
-
+getColumns ${tarray[@]}
 
 ## insert column titles. 
 
