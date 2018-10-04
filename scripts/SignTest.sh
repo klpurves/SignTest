@@ -294,7 +294,7 @@ fi
 
 ## retain only SNP and effect columns for all files.
 
-## Select columns using getcol.sh function
+## Select and rename columns using getcol.sh function
 
 
 if [ $v == 'yes' ]
@@ -321,38 +321,18 @@ for f in ${tarray[@]};do
   mv $(dirname $f)/$(basename $f).short $(dirname $out)/$(basename $f).short
 done
 
-
-## insert column titles. 
-
-if [ $v == 'yes' ]
-then
-  printf "\nNaming effect column according to your target and file names.\n\n" 
-fi
-
-## Base
-{ echo SNP ${bname}.effect; cat ${odir}/${bname}.short;} > ${odir}/${bname}.named
-
-
-## targets
-
-for x in $(seq 1 $lentar)
-do
-  { echo SNP $(basename  ${tarray[$x-1]}).effect; cat ${odir}/$(basename  ${tarray[$x-1]}).short;} >  ${odir}/$(basename  ${tarray[$x-1]}).named
-done
-
-
 ### sort files
 
-awk 'NR<2{print$0;next} {print $0 | "sort -k 1,1"}' ${odir}/${bname}.named  > ${odir}/${bname}.sorted
+awk 'NR<2{print$0;next} {print $0 | "sort -k 1,1"}' ${odir}/${bname}.short  > ${odir}/${bname}.sorted
 
 for x in $(seq 1 $lentar)
 do
-  awk 'NR<2{print$0;next} {print $0 | "sort -k 1,1"}' ${odir}/$(basename  ${tarray[$x-1]}).named  > ${odir}/$(basename  ${tarray[$x-1]}).sorted
+  awk 'NR<2{print$0;next} {print $0 | "sort -k 1,1"}' ${odir}/$(basename  ${tarray[$x-1]}).short  > ${odir}/$(basename  ${tarray[$x-1]}).sorted
 done
 
 ## remove the short / named files. 
 
-rm ${odir}/*.short ${odir}/*.named
+rm ${odir}/*.short 
 
 ### create merged sumstat files containing SNP and effect for each p-threshold
 
