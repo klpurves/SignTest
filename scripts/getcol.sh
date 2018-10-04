@@ -38,6 +38,7 @@ getColumns ()
     done
     
     awk -v a=$a -v b=$b '{print $a,$b}' $file > $(dirname $file)/$(basename $file).short    # cut columns
+    sed -i -e "1s/$WORD/Effect.$(basename $file)/gI" $(dirname $file)/$(basename $file).short
     
   done
   return
