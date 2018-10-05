@@ -23,6 +23,7 @@ function _usage()
   -o Path and name of the results file
   
   Optional input:
+  -l Provide base file that is already clumped for LD. Provide path and filename.
   -p P-thresholds for sign tests (p == 1 is always tested). Defaults to 510-8, 510-6, 510-4, 510-2, 510-1 if left blank. If multiple thresholds are provided, these must be presented in a space seperated list, like so "p1 p2 p3...". 
   -k kb window for clumping. Defaults to 3000 if left blank.
   -r R2 threshold for clumping. Defaults to 0.01 if left blank.
