@@ -24,10 +24,14 @@ export OMP_NUM_THREADS=8
 ###        2) The proportion of SNPS shared at each threshold between the base and each target file provided
 ###        3) Whether this is significantly different from what would be predicted under the null
 
+## Set working directory for source scripts
+
+DIR=$(dirname $(readlink -f '$0'))
+
 ## call in source scripts 
 
-source ./getcol.sh
-source ./usage.sh
+source DIR/getcol.sh
+source DIR/usage.sh
 
 
 ### declarations - basic argument parsing
@@ -432,87 +436,7 @@ done
 
 ### Finish up the r results table and binomial test in R
 
- 
-
-cat <<EOF>> ${odir}/results.tab.R
-
-library(data.table)
-library(ggplot2)
-library(dplyr)
-
-args=commandArgs(TRUE)
-file=args[1]
-path=args[2]
-
-dat<- fread(file)
-
-dat\$Total_SNPs <- apply(dat[,4],1,as.numeric)
-dat\$Total_Shared <- apply(dat[,5],1,as.numeric)
-dat\$Proportion <- apply(dat[,6],1,as.numeric)
-
-
-for (row in 1:dim(dat)[1]){
-  if ((is.na(dat\$Total_Shared[row]) | (dat\$Total_Shared[row] == 0))){
-    dat\$Binomial_test[row] <- NA 
-  } else {
-    dat\$Binomial_test[row] <- binom.test(x=dat\$Total_Shared[row],n=dat\$Total_SNPs[row],p=0.5,conf.level=0.95)\$p.value
-  }
-}
-
-dat <- dat[order(dat\$pthreshold, dat\$Target_sample),]
-
-write.csv(dat, paste(path,'sign.table.csv',sep='/'),quote=F,row.names=F)
-
-## create a plot showing shared SNPs as a proportion of total SNPs for each target / base comparison
-
-dat\$Total_Unshared <- dat\$Total_SNPs - dat\$Total_Shared
-
-datp <- subset(dat,select=c('Base_sample','Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
-datm <- melt(datp,id.vars=c('Base_sample','Target_sample','pthreshold','Proportion'))
-datm\$variable <- factor(datm\$variable,levels=c('Total_Unshared','Total_Shared'))
-
-## Create plot - use dplyr to flag and colour  significant results
-
-plot <- 
-## create variable flagging differing significant levels based on binomial test results 
-datm %>%
-      mutate(sig_flag = ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.001, 'p<0.001',
-                             ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.005, 'p<0.005',
-                             ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.01, 'p<0.01',
-                                    ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test <= 0.05, 'p<0.05',
-                                           ifelse(datm\$variable == "Total_Shared" & datm\$Binomial_test > 0.005,'p>0.05','')))))) %>%
-  
-  ## Change the factor order to create approrpiate colour gradients later
-  
-  mutate(p.value = factor(sig_flag,levels = c("","p>0.05","p<0.05",'p<0.01',"p<0.005","p<0.001"))) %>%
-  
-  ## Create the ggplot
-  
-    ggplot(aes(x=as.factor(pthreshold),y=value))                              +
-    geom_bar(aes(fill=p.value),
-             stat='identity',position='fill')                                 +
-             facet_grid(Base_sample ~ Target_sample)                          +
-              xlab("p-threshold")                                             +
-              ylab("Proportion of total SNPs shared")                         +
-              theme(panel.border = element_blank(),
-                    panel.grid = element_blank(),
-                    strip.text = element_text(face='bold',
-                                  size=12))                                   +
-             geom_hline(yintercept=0.5,linetype="dashed",color="red")         +
-             scale_fill_manual(breaks=c('p>0.05','p<0.05','p<0.01','p<0.005','p<0.001'),
-                               values=c("azure3","#636363","#993399","#0000FF","#30D5C8","#E4FFFF"))
-                               
-
-
-pdf(paste(path,'stacked.bar.pdf',sep='/'),width=15)
-plot
-dev.off()
-
-EOF
-
-## If label of facet names has been provided include these. If not, use default names. 
-
-  Rscript ${odir}/results.tab.R ${out}_results.csv ${odir}/
+  Rscript DIR/results.R ${out}_results.csv ${odir}/
 
   mv ${odir}/sign.table.csv ${odir}/$(basename $out)_results.csv
   mv ${odir}/stacked.bar.pdf ${odir}/$(basename $out)_stacked.bar.pdf
@@ -527,14 +451,12 @@ if [ $v == 'yes' ]
     printf '\n\n Sign test completed.... cleaning folders...\n\n'
     rm ${odir}/*.sign
     rm ${odir}/*.snplist
-    rm ${odir}/results.tab.R
     printf '\n\n Folder clean. Script completed\n\n'
     printf '\n\n Goodbye.\n\n'
     printf '\n\n###############################\n\n'
   else 
     rm ${odir}/*.sign
     rm ${odir}/*.snplist
-    rm ${odir}/results.tab.R
     printf '\n\n###############################\n\n'
     echo 'Results saved to ' ${odir}/${bname}_results.csv
     printf '\n For results of two-sided exact binomial test, see results table.'
