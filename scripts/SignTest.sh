@@ -206,6 +206,7 @@ fi
 ## Perform clumping on the base file or get previously clumped file. 
 
 if [ $l == 'empty' ] 
+then
   if [ $v == 'yes' ]
   then
   printf 'Performing clumping on ' 
@@ -247,12 +248,17 @@ if [ $l == 'empty' ]
   cat $(dirname $out)/$bname.CLUMPED.* >> $(dirname $out)/$bname.WG.clump
 
   rm $(dirname $out)/*CLUMPED*
+else
+  echo 'Will use user provided clumped file' 
 fi
 
 ## If clumped file is provided copy this to the working folder. If set to save, will keep as usual later. Else will be removed later.
 
 if [ $l != 'empty' ]
+then
   cp $l $(dirname $out)/$bname.WG.clump
+else
+  echo 'clumping complete'
 fi
 
   ## Create p-thresholded clumped files based on default or user input.
