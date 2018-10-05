@@ -50,6 +50,7 @@ p='5.10e-8 5.10e-6 5.10e-4 5.10e-2 5.10e-1'
 v='no'
 s='no'
 c='no'
+l='empty
 facet_names=empty
 
 ## If there are no options then exit 
@@ -69,7 +70,7 @@ printf '\n'
 ## Parse command line flags with getopts 
 
 
-while getopts 'b:t:o:p:r:k:shvc' OPTION
+while getopts 'b:t:o:p:r:k:l:shvc' OPTION
 do
   case "$OPTION" in
   b  ) base="$OPTARG"      ;;
@@ -81,6 +82,7 @@ do
   s  ) s='yes'             ;;
   c  ) c='yes'             ;;
   v  ) v='yes'             ;;
+  l  ) l="$OPTARG"         ;;
   h  ) _usage              ;;
   ? ) _usage               ;;
 esac
@@ -201,49 +203,57 @@ printf '\n'
 fi
 
 
-## Perform clumping on the base file. 
+## Perform clumping on the base file or get previously clumped file. 
 
-if [ $v == 'yes' ]
-then
-printf 'Performing clumping on ' 
-echo $bname ' using the following parameters: ' 
-printf '\n' 
-printf 'p1 & p2 == 1\nr2 == ' 
-echo $r 'clumping window =' $k 'kb'
-printf '\n\n'
+if [ $l == 'empty' ] 
+  if [ $v == 'yes' ]
+  then
+  printf 'Performing clumping on ' 
+  echo $bname ' using the following parameters: ' 
+  printf '\n' 
+  printf 'p1 & p2 == 1\nr2 == ' 
+  echo $r 'clumping window =' $k 'kb'
+  printf '\n\n'
 
-else
-  printf 'Beginning clumping...'
+  else
+    printf 'Beginning clumping...'
+  fi
+
+
+  for i in {1..22}
+  do
+
+  /mnt/lustre/groups/ukbiobank/Edinburgh_Data/Software/plink \
+  --bfile /mnt/lustre/groups/ukbiobank/Edinburgh_Data/Resources/1KG/1KG_Phase3/1KG_Phase3.chr$i.CLEANED.EUR \
+  --clump $base \
+  --clump-kb $k \
+  --clump-p1 1 \
+  --clump-p2 1 \
+  --clump-r2 $r \
+  --clump-range /mnt/lustre/groups/ukbiobank/Edinburgh_Data/Resources/glist-hg19 \
+  --out $(dirname $out)/$bname.CLUMPED.$i
+
+  done
+
+  ## Merge the clumped files, then remove the individual files.
+
+  if [ $v == 'yes' ]
+  then
+    printf '\n\nClumping complete.\n\nConcatenating chromosome files and removing individually clumped files\n'
+  else
+    printf '\n\nClumping complete\n\n'
+  fi
+
+  cat $(dirname $out)/$bname.CLUMPED.* >> $(dirname $out)/$bname.WG.clump
+
+  rm $(dirname $out)/*CLUMPED*
 fi
 
+## If clumped file is provided copy this to the working folder. If set to save, will keep as usual later. Else will be removed later.
 
-for i in {1..22}
-do
-
-/mnt/lustre/groups/ukbiobank/Edinburgh_Data/Software/plink \
---bfile /mnt/lustre/groups/ukbiobank/Edinburgh_Data/Resources/1KG/1KG_Phase3/1KG_Phase3.chr$i.CLEANED.EUR \
---clump $base \
---clump-kb $k \
---clump-p1 1 \
---clump-p2 1 \
---clump-r2 $r \
---clump-range /mnt/lustre/groups/ukbiobank/Edinburgh_Data/Resources/glist-hg19 \
---out $(dirname $out)/$bname.CLUMPED.$i
-
-done
-
-## Merge the clumped files, then remove the individual files.
-
-if [ $v == 'yes' ]
-then
-  printf '\n\nClumping complete.\n\nConcatenating chromosome files and removing individually clumped files\n'
-else
-  printf '\n\nClumping complete\n\n'
+if [ $l != 'empty' ]
+  cp $l $(dirname $out)/$bname.WG.clump
 fi
-
-cat $(dirname $out)/$bname.CLUMPED.* >> $(dirname $out)/$bname.WG.clump
-
-rm $(dirname $out)/*CLUMPED*
 
   ## Create p-thresholded clumped files based on default or user input.
 
@@ -290,7 +300,7 @@ then
   printf 'created and moved to ' 
   echo ${odir}/Clumped.P1  
 else
-rm bname.WG.clump
+rm $bname.WG.clump
 fi
 
 
