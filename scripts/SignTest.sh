@@ -30,8 +30,8 @@ DIR=$(dirname $(readlink -f '$0'))
 
 ## call in source scripts 
 
-source DIR/getcol.sh
-source DIR/usage.sh
+source $DIR/getcol.sh
+source $DIR/usage.sh
 
 
 ### declarations - basic argument parsing
@@ -452,7 +452,7 @@ done
 
 ### Finish up the r results table and binomial test in R
 
-  Rscript DIR/results.R ${out}_results.csv ${odir}/
+  Rscript $DIR/results.R ${out}_results.csv ${odir}/
 
   mv ${odir}/sign.table.csv ${odir}/$(basename $out)_results.csv
   mv ${odir}/stacked.bar.pdf ${odir}/$(basename $out)_stacked.bar.pdf
