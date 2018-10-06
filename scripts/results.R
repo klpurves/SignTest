@@ -52,10 +52,10 @@ dat$Binomial_test <- ifelse(is.na(dat$Binomial_test),1,dat$Binomial_test)
 dat$Total_Unshared <- dat$Total_SNPs - dat$Total_Shared
 
 # Subset 
-datp <- subset(dat,select=c('Base_sample','Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared'))
+datp <- subset(dat,select=c('Base_sample','Target_sample','Proportion','pthreshold','Total_Shared','Total_Unshared','Binomial_test'))
 
 # Melt dataframe for plotting
-datm <- melt(datp,id.vars=c('Base_sample','Target_sample','pthreshold','Proportion'))
+datm <- melt(datp,id.vars=c('Base_sample','Target_sample','pthreshold','Proportion','Binomial_test'))
 
 # Order variable factor
 datm$variable <- factor(datm$variable,levels=c('Total_Unshared','Total_Shared'))
