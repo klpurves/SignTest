@@ -50,7 +50,7 @@ p='5.10e-8 5.10e-6 5.10e-4 5.10e-2 5.10e-1'
 v='no'
 s='no'
 c='no'
-l='empty
+l=empty
 facet_names=empty
 
 ## If there are no options then exit 
