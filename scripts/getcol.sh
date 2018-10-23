@@ -37,7 +37,13 @@ getColumns ()
         fi
     done
     
-    awk -v a=$a -v b=$b '{print $a,$b}' $file > $(dirname $file)/$(basename $file).short    # cut columns
+    if [ $b == 'OR' ]
+    then
+      awk -v a=$a -v b=$b '{print $a,log($b)}' $file > $(dirname $file)/$(basename $file).short    # cut columns
+    else
+      awk -v a=$a -v b=$b '{print $a,$b}' $file > $(dirname $file)/$(basename $file).short    # cut columns
+    fi
+    
     sed -i -e "1s/$WORD/Effect.$(basename $file)/gI" $(dirname $file)/$(basename $file).short
     
   done
